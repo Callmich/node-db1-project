@@ -34,7 +34,22 @@ router.get("/:id", (req, res)=>{
 })
 
 router.post("/", (req, res)=>{
-
+    const acctData = req.body
+    db("accounts")
+    .insert(acctData, 'id')
+    .then(newId =>{
+        const id = newId[0];
+        db("accounts")
+        .where({ id })
+        .first()
+        .then(newAcct =>{
+            res.status(200).json(newAcct)
+        })
+    })
+    .catch(error =>{
+        console.log(error)
+        res.status(500).json({error: "Server Error creating new account"})
+    })
 })
 
 router.patch("/:id", (req, res)=>{
