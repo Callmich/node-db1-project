@@ -53,11 +53,41 @@ router.post("/", (req, res)=>{
 })
 
 router.patch("/:id", (req, res)=>{
+    const changes = req.body;
+    const { id } = req.params;
 
+    db("accounts")
+    .where({ id })
+    .update(changes)
+    .then(number => {
+        if (number > 0){
+            res.status(200).json({message: "Update successful"})
+        } else{
+            res.status(404).json({message: `The account with ID ${req.params.id} does not exist`})
+        }
+    })
+    .catch(error =>{
+        console.log(error)
+        res.status(500).json({error: "Server error updating the account"})
+    })
 })
 
 router.delete("/:id", (req, res)=>{
+    db("accounts")
+    .where("id", req.params.id)
+    .del()
+    .then(delAcct =>{
+        if(delAcct){
+            console.log(delAcct)
+            res.status(200).json({message: "Account Deleted"})
+        } else{
+            res.status(404).json({message: `The account ${req.params.id} does not exist`})
+        }
 
+    })
+    .catch(error =>{
+        res.status(500).json({message: "Server error while deleting"})
+    })
 })
 
 module.exports = router;
